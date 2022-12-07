@@ -1,0 +1,77 @@
+############# Librerias #############
+import cx_Oracle
+import os
+from time import sleep
+import tkinter as tk
+from tkinter import ttk
+
+############# Iniciar Sesión #############
+Sesion = tk.Tk()
+Sesion.title("Iniciar Sesión")
+Sesion.geometry("310x150")
+Sesion.configure(bg="Yellow")
+TitleIS = tk.Label(Sesion, text="Inicio de Sesión Oracle", bg="Blue", fg="white", font=("Comic Sans MS", 10))
+TitleIS.pack(fill = tk.X)
+LabelU = tk.Label(Sesion, text="Usuario", bg="orange", fg="black", font=("Comic Sans MS", 10))
+LabelU.pack()
+EntryU = tk.Entry(Sesion, width=30, justify="center") ### Usuario ###
+EntryU.pack()
+LabelC = tk.Label(Sesion, text="Contraseña", bg="orange", fg="black", font=("Comic Sans MS", 10))
+LabelC.pack()
+EntryC = tk.Entry(Sesion, width=30, show="*", justify="center") ### Contraseña ###
+EntryC.pack()
+############# Conección Oracle #############
+def Conexion():
+    global EntryU, EntryC
+    os.environ["TNS_ADMIN"] = "Direccion donde esta guardado el wallet"
+    connection = cx_Oracle.connect("Nombre Bd", "Contra BD", "Servicio BD")
+    cursor = connection.cursor()
+    sql = "SELECT username, password FROM UsuariosProgra WHERE username = '"+EntryU.get()+"' and password = '"+EntryC.get()+"'"
+    print("Ejecutando: " + sql)
+    resultado = cursor.execute(sql)
+    print(resultado)
+    Encontrado = False
+    for result in resultado:
+        Encontrado = True
+    if(Encontrado):
+        print("Validando Datos...")
+        sleep(2)
+        print("Usuario validado: "+result[0]) 
+        sleep(2)
+        os.system("cls")
+        sleep(1)
+##################### Ventana Cajero #####################
+        if (EntryU.get() == "cajero" and EntryC.get() == "cajero"):
+            Sesion.destroy()
+            print("Bienvenido "+result[0]+"!!!")
+            Cajero = tk.Tk()
+            Cajero.title("Cajero")
+            Cajero.geometry("310x150")
+            Cajero.configure(bg="Purple")
+            TitleC = tk.Label(Cajero, text="Punto De Venta", bg="Blue", fg="white", font=("Comic Sans MS", 10))
+            TitleC.pack(fill = tk.X)
+
+            Cajero.mainloop()
+            
+##################### Ventana Administrador #####################
+        if (EntryU.get() == "administrador" and EntryC.get() == "administrador"):
+            Sesion.destroy()
+            print("Bienvenido "+result[0]+"!!!")
+            Admin = tk.Tk()
+            Admin.title("Administrador")
+            Admin.geometry("310x150")
+            Admin.configure(bg="Brown")
+            TitleA = tk.Label(Admin, text="Configuración", bg="Blue", fg="white", font=("Comic Sans MS", 10))
+            TitleA.pack(fill = tk.X)
+            
+            Admin.mainloop()
+    else:
+        print("Validando Datos...")
+        sleep(2)
+        print("No Hay Datos")
+        os.system("cls")
+        sleep(1)
+        print("Usuario o Contraseña Incorrecta")
+BotonConexion = tk.Button(Sesion, text="Iniciar Sesión", command=Conexion, bg="green", fg="white", font=("Comic Sans MS", 10))
+BotonConexion.pack()
+Sesion.mainloop()
